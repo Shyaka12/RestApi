@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 @Service
 public class StudentServiceImpl implements StudentService {
+
     @Autowired
     private StudentRepository studentRepository;
 
@@ -27,7 +28,7 @@ public class StudentServiceImpl implements StudentService {
     public Student getStudentById(int id) {
         try {
             Optional<Student> student = studentRepository.findById(id);
-            if (!student.isPresent()) {
+            if (student.isEmpty()) {
                 throw new RuntimeException("Student not found with id: " + id);
             }
             return student.get();
@@ -50,7 +51,7 @@ public class StudentServiceImpl implements StudentService {
         try {
             Optional<Student> optionalStudent = studentRepository.findById(id);
 
-            if (!optionalStudent.isPresent()) {
+            if (optionalStudent.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
@@ -71,7 +72,7 @@ public class StudentServiceImpl implements StudentService {
     public void deleteStudent(int id) {
         try {
             Optional<Student> student = studentRepository.findById(id);
-            if (!student.isPresent()) {
+            if (student.isEmpty()) {
                 throw new RuntimeException("Student not found with id: " + id);
             }
             studentRepository.delete(student.get());
