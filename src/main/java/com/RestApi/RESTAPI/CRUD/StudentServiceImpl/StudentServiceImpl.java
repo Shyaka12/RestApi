@@ -50,11 +50,9 @@ public class StudentServiceImpl implements StudentService {
     public ResponseEntity<Student> updateStudent(int id, Student updatedStudent) {
         try {
             Optional<Student> optionalStudent = studentRepository.findById(id);
-
             if (optionalStudent.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-
             Student existingStudent = optionalStudent.get();
             existingStudent.setFirstName(updatedStudent.getFirstName());
             existingStudent.setLastName(updatedStudent.getLastName());
