@@ -17,39 +17,66 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        try {
+            return studentRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Error while fetching students: " + e.getMessage());
+        }
     }
-
     @Override
     public Student getStudentById(int id) {
-        return studentRepository.findById(id).get();
+        try {
+            Optional<Student> student = studentRepository.findById(id);
+            if (!student.isPresent()) {
+                throw new RuntimeException("Student not found with id: " + id);
+            }
+            return student.get();
+        } catch (Exception e) {
+            throw new RuntimeException("Error while fetching student: " + e.getMessage());
+        }
     }
 
     @Override
     public void createStudent(Student student) {
-        studentRepository.save(student);
+        try {
+            studentRepository.save(student);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while creating student: " + e.getMessage());
+        }
     }
 
     @Override
     public ResponseEntity<Student> updateStudent(int id, Student updatedStudent) {
-        Optional<Student> optionalStudent = studentRepository.findById(id);
+        try {
+            Optional<Student> optionalStudent = studentRepository.findById(id);
 
-        if (!optionalStudent.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            if (!optionalStudent.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            Student existingStudent = optionalStudent.get();
+            existingStudent.setFirstName(updatedStudent.getFirstName());
+            existingStudent.setLastName(updatedStudent.getLastName());
+            existingStudent.setPercentange(updatedStudent.getPercentange());
+
+            Student savedStudent = studentRepository.save(existingStudent);
+            return ResponseEntity.ok(savedStudent);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error while updating student: " + e.getMessage());
         }
-
-        Student existingStudent = optionalStudent.get();
-        existingStudent.setFirstName(updatedStudent.getFirstName());
-        existingStudent.setLastName(updatedStudent.getLastName());
-        existingStudent.setPercentange(updatedStudent.getPercentange());
-
-        studentRepository.save(existingStudent);
-        return ResponseEntity.ok(existingStudent);
     }
 
     @Override
     public void deleteStudent(int id) {
-        Student student = studentRepository.findById(id).get();
-        studentRepository.delete(student);
+        try {
+            Optional<Student> student = studentRepository.findById(id);
+            if (!student.isPresent()) {
+                throw new RuntimeException("Student not found with id: " + id);
+            }
+            studentRepository.delete(student.get());
+        } catch (Exception e) {
+            throw new RuntimeException("Error while deleting student: " + e.getMessage());
+        }
     }
 }
